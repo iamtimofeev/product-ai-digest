@@ -1,0 +1,29 @@
+name: Product AI Digest
+
+on:
+  schedule:
+    # 23:00 по Москве (МСК = UTC+3) = 20:00 UTC
+    - cron: "0 20 * * *"
+  workflow_dispatch: {}  # позволяет запустить вручную кнопкой в GitHub для теста
+
+jobs:
+  send-digest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run digest script
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python digest.py
